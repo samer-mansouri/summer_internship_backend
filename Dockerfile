@@ -11,6 +11,18 @@ COPY . .
 #     && envsubst < .env.backend > .env \
 #     && rm .env.backend
 
+RUN echo "DATABASE_HOST=db" > .env && \
+    echo "DATABASE_PORT=3306" >> .env && \
+    echo "DATABASE_USER=user" >> .env && \
+    echo "DATABASE_PASSWORD=password" >> .env && \
+    echo "DATABASE_NAME=mydatabase" >> .env && \
+    echo "DATABASE_DRIVER=mysql" >> .env && \
+    echo "" >> .env && \
+    echo "REDIS_HOST=redis" >> .env && \
+    echo "REDIS_PORT=6379" >> .env && \
+    echo "REDIS_PASSWORD=optional" >> .env && \
+    echo "REDIS_DB=0" >> .env
+
 RUN npm run build
 
 # Stage 2: Production
