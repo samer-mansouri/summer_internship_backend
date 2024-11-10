@@ -1,0 +1,43 @@
+name: Build and Deploy Docker Image
+
+on:
+  push:
+    branches:
+      - master  # Trigger when there’s a push to the `main` branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # This uses a Ubuntu runner
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3  # Checkout the code from the repo
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2  # Set up Docker Buildx for advanced builds
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t samermansouri21/backend:latest .
+          docker push samermansouri21/backend:latest
+
+      - name: SSH into the Server and Pull the Latest Docker Image
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_IP }}   # Your server's IP address
+          username: ${{ secrets.SERVER_USER }}  # SSH username
+          password: ${{ secrets.SERVER_PASSWORD }}  # SSH password or private key for SSH
+          script: |
+            # Pull the latest image on the server
+            docker pull samermansouri21/backend:latest
+            # Stop and remove the old container if it exists
+            docker stop backend || true
+            docker rm backend || true
+            # Run the new container
+            docker run -d -p 80:80 --name backend samermansouri21/backend:latest
