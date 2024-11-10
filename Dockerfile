@@ -7,9 +7,9 @@ RUN npm install
 COPY . .
 
 # Dynamically inject environment variables into .env file at build time
-RUN apt-get update && apt-get install -y gettext-base \
-    && envsubst < .env.backend > .env \
-    && rm .env.backend
+# RUN apt-get update && apt-get install -y gettext-base \
+#     && envsubst < .env.backend > .env \
+#     && rm .env.backend
 
 RUN npm run build
 
